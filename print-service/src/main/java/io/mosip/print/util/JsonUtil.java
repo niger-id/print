@@ -1,5 +1,16 @@
 package io.mosip.print.util;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.*;
+import io.mosip.print.dto.JsonValue;
+import io.mosip.print.exception.FieldNotFoundException;
+import io.mosip.print.exception.InstantanceCreationException;
+import io.mosip.print.exception.PlatformErrorMessages;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -8,23 +19,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-
-import io.mosip.print.dto.JsonValue;
-import io.mosip.print.exception.FieldNotFoundException;
-import io.mosip.print.exception.InstantanceCreationException;
-import io.mosip.print.exception.PlatformErrorMessages;
 
 /**
  * This class provides JSON utilites.

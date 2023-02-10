@@ -3,35 +3,24 @@
  */
 package io.mosip.print.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import io.mosip.print.constant.BiometricType;
+import io.mosip.print.constant.CbeffConstant;
+import io.mosip.print.entity.*;
+import io.mosip.print.exception.CbeffException;
+import org.apache.commons.codec.binary.Base64;
+import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.codec.binary.Base64;
-import org.xml.sax.SAXException;
-
-import io.mosip.print.constant.BiometricType;
-import io.mosip.print.constant.CbeffConstant;
-import io.mosip.print.entity.BDBInfo;
-import io.mosip.print.entity.BIR;
-import io.mosip.print.entity.BIRInfo;
-import io.mosip.print.entity.RegistryIDType;
-import io.mosip.print.entity.SingleAnySubtypeType;
-import io.mosip.print.entity.VersionType;
-import io.mosip.print.exception.CbeffException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.time.ZoneOffset;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**

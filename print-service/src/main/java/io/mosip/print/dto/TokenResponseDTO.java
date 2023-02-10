@@ -1,10 +1,10 @@
 package io.mosip.print.dto;
 
-import java.util.Arrays;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Arrays;
 
 @Data
 @Getter

@@ -1,10 +1,10 @@
 package io.mosip.print.model;
 
-import java.util.Arrays;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Arrays;
 
 /**
  * Certificate Key Entry from SoftHsm

@@ -10,9 +10,10 @@ package io.mosip.print.util;
  * and to use kernel cryptoutil for Base64 conversion.
  *
  */
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import io.mosip.kernel.core.util.CryptoUtil;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class Base64Adapter extends XmlAdapter<String, byte[]> {
 

@@ -1,7 +1,11 @@
 package io.mosip.print.service.impl;
 
-import java.util.List;
-
+import io.mosip.print.constant.ApiName;
+import io.mosip.print.exception.ApisResourceAccessException;
+import io.mosip.print.exception.PlatformErrorMessages;
+import io.mosip.print.logger.PrintLogger;
+import io.mosip.print.service.PrintRestClientService;
+import io.mosip.print.util.RestApiClient;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -11,14 +15,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import io.mosip.print.constant.ApiName;
-import io.mosip.print.constant.LoggerFileConstant;
-import io.mosip.print.exception.ApisResourceAccessException;
-import io.mosip.print.exception.ExceptionUtils;
-import io.mosip.print.exception.PlatformErrorMessages;
-import io.mosip.print.logger.PrintLogger;
-import io.mosip.print.service.PrintRestClientService;
-import io.mosip.print.util.RestApiClient;
+import java.util.List;
 
 /**
  * The Class RegistrationProcessorRestClientServiceImpl.

@@ -1,8 +1,12 @@
 package io.mosip.print.test.controller;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.mosip.print.controller.Print;
 import io.mosip.print.model.Event;
+import io.mosip.print.model.EventModel;
+import io.mosip.print.service.PrintService;
+import io.mosip.print.test.TestBootApplication;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,13 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import io.mosip.print.controller.Print;
-import io.mosip.print.model.EventModel;
-import io.mosip.print.service.PrintService;
-import io.mosip.print.test.TestBootApplication;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestBootApplication.class)

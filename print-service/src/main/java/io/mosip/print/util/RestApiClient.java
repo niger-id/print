@@ -1,9 +1,6 @@
 package io.mosip.print.util;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Iterator;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import io.mosip.print.logger.PrintLogger;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,15 +14,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.Gson;
-
-import io.mosip.print.constant.LoggerFileConstant;
-import io.mosip.print.dto.Metadata;
-import io.mosip.print.dto.PasswordRequest;
-import io.mosip.print.dto.SecretKeyRequest;
-import io.mosip.print.dto.TokenRequestDTO;
-import io.mosip.print.exception.TokenGenerationFailedException;
-import io.mosip.print.logger.PrintLogger;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Iterator;
 
 /**
  * The Class RestApiClient.

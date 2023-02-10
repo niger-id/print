@@ -1,9 +1,9 @@
 package io.mosip.print.idrepo.dto;
 
-import java.util.List;
-
 import io.mosip.print.dto.Documents;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * The Class ResponseDTO.

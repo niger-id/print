@@ -1,9 +1,13 @@
 package io.mosip.print.util;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import io.mosip.print.controller.Print;
+import io.mosip.print.dto.ErrorDTO;
+import io.mosip.print.dto.PrintResponse;
+import io.mosip.print.exception.*;
+import io.mosip.print.logger.PrintLogger;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -13,24 +17,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-
-import io.mosip.print.controller.Print;
-import io.mosip.print.dto.ErrorDTO;
-import io.mosip.print.dto.PrintResponse;
-import io.mosip.print.exception.AccessDeniedException;
-import io.mosip.print.exception.BaseCheckedException;
-import io.mosip.print.exception.BaseUncheckedException;
-import io.mosip.print.exception.InvalidTokenException;
-import io.mosip.print.exception.PDFGeneratorException;
-import io.mosip.print.exception.PDFSignatureException;
-import io.mosip.print.exception.PlatformErrorMessages;
-import io.mosip.print.exception.RegPrintAppException;
-import io.mosip.print.exception.RegStatusAppException;
-import io.mosip.print.exception.TemplateProcessingFailureException;
-import io.mosip.print.logger.PrintLogger;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * The Class PrintExceptionHandler.

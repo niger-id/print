@@ -1,9 +1,14 @@
 package io.mosip.print.util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.mosip.print.constant.ApiName;
+import io.mosip.print.dto.DataShare;
+import io.mosip.print.dto.DataShareResponseDto;
+import io.mosip.print.dto.ErrorDTO;
+import io.mosip.print.exception.ApiNotAccessibleException;
+import io.mosip.print.exception.DataShareException;
+import io.mosip.print.logger.PrintLogger;
+import io.mosip.print.service.PrintRestClientService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -15,16 +20,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.mosip.print.constant.ApiName;
-import io.mosip.print.dto.DataShare;
-import io.mosip.print.dto.DataShareResponseDto;
-import io.mosip.print.dto.ErrorDTO;
-import io.mosip.print.exception.ApiNotAccessibleException;
-import io.mosip.print.exception.DataShareException;
-import io.mosip.print.logger.PrintLogger;
-import io.mosip.print.service.PrintRestClientService;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class DataShareUtil {

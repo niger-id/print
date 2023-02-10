@@ -1,13 +1,11 @@
 package io.mosip.print.core.http;
 
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 public class RequestWrapper<T> {

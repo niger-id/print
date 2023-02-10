@@ -1,14 +1,14 @@
 package io.mosip.print.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.mosip.print.constant.BiometricFunction;
 import io.mosip.print.constant.BiometricType;
 import io.mosip.print.entity.RegistryIDType;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Data
 public class SDKInfo {

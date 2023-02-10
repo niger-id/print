@@ -1,26 +1,6 @@
 package io.mosip.print.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.log.NullLogChute;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.mosip.kernel.core.templatemanager.exception.TemplateMethodInvocationException;
 import io.mosip.kernel.core.templatemanager.exception.TemplateParsingException;
 import io.mosip.kernel.core.templatemanager.exception.TemplateResourceNotFoundException;
@@ -35,6 +15,24 @@ import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.service.PrintRestClientService;
 import io.mosip.print.service.impl.TemplateManagerImpl;
 import io.mosip.print.spi.TemplateManager;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.log.NullLogChute;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * The Class TemplateGenerator.

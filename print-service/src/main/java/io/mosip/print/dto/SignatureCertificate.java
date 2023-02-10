@@ -1,18 +1,17 @@
 package io.mosip.print.dto;
 
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import io.mosip.print.model.CertificateEntry;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
 
 /**
  * Response class for Signature

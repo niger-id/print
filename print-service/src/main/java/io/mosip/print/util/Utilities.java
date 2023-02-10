@@ -1,20 +1,6 @@
 package io.mosip.print.util;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import io.mosip.print.constant.ApiName;
 import io.mosip.print.constant.LoggerFileConstant;
 import io.mosip.print.constant.MappingJsonConstants;
@@ -27,6 +13,18 @@ import io.mosip.print.idrepo.dto.IdResponseDTO1;
 import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.service.PrintRestClientService;
 import lombok.Data;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * The Class Utilities.

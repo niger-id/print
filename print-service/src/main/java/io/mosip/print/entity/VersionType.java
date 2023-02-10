@@ -7,19 +7,13 @@
 
 package io.mosip.print.entity;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.xml.bind.annotation.*;
+import java.io.Serializable;
 
 @Data
 @JsonDeserialize(builder = VersionType.VersionTypeBuilder.class)

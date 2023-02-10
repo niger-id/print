@@ -1,8 +1,8 @@
 package io.mosip.print.model;
 
-import java.util.Map;
-
 import lombok.Data;
+
+import java.util.Map;
 @Data
 public class Event {
     private String id; //uuid

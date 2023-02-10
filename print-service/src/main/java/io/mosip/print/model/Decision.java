@@ -1,12 +1,12 @@
 package io.mosip.print.model;
 
+import io.mosip.print.constant.Match;
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.mosip.print.constant.Match;
-import lombok.Data;
 
 @Data
 public class Decision {

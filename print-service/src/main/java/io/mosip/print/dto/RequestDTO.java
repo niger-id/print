@@ -1,9 +1,9 @@
 package io.mosip.print.dto;
 
-import java.io.Serializable;
-
 import io.mosip.print.constant.IdType;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * Instantiates a new request DTO.

@@ -1,8 +1,8 @@
 package io.mosip.print.service.impl;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Properties;
-
+import io.mosip.print.spi.TemplateManager;
+import io.mosip.print.spi.TemplateManagerBuilder;
+import lombok.Getter;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.log.NullLogChute;
@@ -10,9 +10,8 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.apache.velocity.runtime.resource.loader.FileResourceLoader;
 import org.springframework.stereotype.Component;
 
-import io.mosip.print.spi.TemplateManager;
-import io.mosip.print.spi.TemplateManagerBuilder;
-import lombok.Getter;
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 
 @Getter
 @Component

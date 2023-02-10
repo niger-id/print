@@ -1,11 +1,9 @@
 package io.mosip.print.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
-
-import io.mosip.print.dto.BaseRestResponseDTO;
-import io.mosip.print.dto.ErrorDTO;
-import lombok.Data;
 
 @Data
 public class VidResponseDTO extends BaseRestResponseDTO implements Serializable{

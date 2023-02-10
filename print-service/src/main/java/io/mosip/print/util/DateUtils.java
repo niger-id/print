@@ -16,26 +16,16 @@
  */
 package io.mosip.print.util;
 
+import io.mosip.print.constant.DateUtilConstants;
+import io.mosip.print.exception.IllegalArgumentException;
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.TimeZone;
-
-import org.apache.commons.lang3.time.DateFormatUtils;
-
-import io.mosip.print.constant.DateUtilConstants;
-import io.mosip.print.exception.IllegalArgumentException;
+import java.util.*;
 
 /**
  * Utilities for Date Time operations.

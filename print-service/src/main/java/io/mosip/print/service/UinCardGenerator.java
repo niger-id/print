@@ -1,9 +1,9 @@
 package io.mosip.print.service;
 
-import java.io.InputStream;
-
 import io.mosip.print.constant.UinCardType;
 import io.mosip.print.exception.ApisResourceAccessException;
+
+import java.io.InputStream;
 
 /**
  * The Interface UinCardGenerator.

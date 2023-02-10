@@ -1,11 +1,11 @@
 package io.mosip.print.exception;
 
-import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 /**
  * This class is the entity class for the BaseUncheckedException and

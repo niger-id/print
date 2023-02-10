@@ -1,10 +1,10 @@
 package io.mosip.print.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.mosip.print.constant.BiometricType;
 import lombok.Data;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Data

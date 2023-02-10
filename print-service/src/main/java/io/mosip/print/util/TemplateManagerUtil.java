@@ -1,8 +1,8 @@
 package io.mosip.print.util;
 
-import java.util.Map;
-
 import org.apache.velocity.VelocityContext;
+
+import java.util.Map;
 
 /**
  * TemplateManagerUtil contain Utility methods

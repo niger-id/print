@@ -1,9 +1,9 @@
 package io.mosip.print.spi;
 
+import io.mosip.print.entity.BIR;
+
 import java.util.List;
 import java.util.Map;
-
-import io.mosip.print.entity.BIR;
 
 /**
  * @author 

@@ -1,8 +1,8 @@
 package io.mosip.print.dto;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * Response Dto for Template details

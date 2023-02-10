@@ -1,22 +1,5 @@
 package io.mosip.print.service.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Objects;
-
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
-
 import io.mosip.print.constant.TemplateManagerConstant;
 import io.mosip.print.constant.TemplateManagerExceptionCodeConstant;
 import io.mosip.print.exception.TemplateMethodInvocationException;
@@ -24,6 +7,17 @@ import io.mosip.print.exception.TemplateParsingException;
 import io.mosip.print.exception.TemplateResourceNotFoundException;
 import io.mosip.print.spi.TemplateManager;
 import io.mosip.print.util.TemplateManagerUtil;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Implementation of {@link TemplateManager} which uses Velocity Template

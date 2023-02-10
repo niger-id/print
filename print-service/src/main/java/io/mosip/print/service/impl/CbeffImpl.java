@@ -1,20 +1,18 @@
 package io.mosip.print.service.impl;
 
+import io.mosip.print.entity.BIR;
+import io.mosip.print.spi.CbeffUtil;
+import io.mosip.print.util.CbeffValidator;
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import io.mosip.print.entity.BIR;
-import io.mosip.print.spi.CbeffUtil;
-import io.mosip.print.util.CbeffValidator;
 
 /**
  * This class is used to create,update, validate and search Cbeff data.

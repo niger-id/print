@@ -1,8 +1,8 @@
 package io.mosip.print.spi;
 
-import java.io.IOException;
-
 import io.mosip.print.exception.QrcodeGenerationException;
+
+import java.io.IOException;
 
 /**
  * Interface for QR-Code-Generation

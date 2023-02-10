@@ -1,14 +1,5 @@
 package io.mosip.print.util;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-
 import io.mosip.print.constant.ApiName;
 import io.mosip.print.constant.AuditLogConstant;
 import io.mosip.print.constant.LoggerFileConstant;
@@ -18,6 +9,14 @@ import io.mosip.print.dto.AuditRequestDto;
 import io.mosip.print.dto.AuditResponseDto;
 import io.mosip.print.exception.ApisResourceAccessException;
 import io.mosip.print.service.PrintRestClientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * The Class AuditRequestBuilder.

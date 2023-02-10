@@ -1,18 +1,16 @@
 package io.mosip.print.test.util;
 
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
+import io.mosip.print.constant.UinCardType;
+import io.mosip.print.core.http.ResponseWrapper;
+import io.mosip.print.dto.ErrorDTO;
+import io.mosip.print.dto.SignatureResponseDto;
+import io.mosip.print.exception.ApisResourceAccessException;
+import io.mosip.print.exception.PDFGeneratorException;
+import io.mosip.print.exception.PDFSignatureException;
+import io.mosip.print.service.PrintRestClientService;
+import io.mosip.print.service.impl.UinCardGeneratorImpl;
+import io.mosip.print.spi.PDFGenerator;
+import io.mosip.print.test.TestBootApplication;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,17 +23,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import io.mosip.print.constant.UinCardType;
-import io.mosip.print.core.http.ResponseWrapper;
-import io.mosip.print.dto.ErrorDTO;
-import io.mosip.print.dto.SignatureResponseDto;
-import io.mosip.print.exception.ApisResourceAccessException;
-import io.mosip.print.exception.PDFGeneratorException;
-import io.mosip.print.exception.PDFSignatureException;
-import io.mosip.print.service.PrintRestClientService;
-import io.mosip.print.service.impl.UinCardGeneratorImpl;
-import io.mosip.print.spi.PDFGenerator;
-import io.mosip.print.test.TestBootApplication;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = TestBootApplication.class)
 @RunWith(SpringRunner.class)

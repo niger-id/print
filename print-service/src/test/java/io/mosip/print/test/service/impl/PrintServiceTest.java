@@ -1,24 +1,5 @@
 package io.mosip.print.test.service.impl;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import io.mosip.kernel.core.util.CryptoUtil;
 import io.mosip.print.constant.QrVersion;
 import io.mosip.print.dto.IdResponseDTO1;
@@ -34,6 +15,24 @@ import io.mosip.print.util.CryptoCoreUtil;
 import io.mosip.print.util.JsonUtil;
 import io.mosip.print.util.TemplateGenerator;
 import io.mosip.print.util.Utilities;
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 
 @SpringBootTest(classes = TestBootApplication.class)

@@ -1,13 +1,5 @@
 package io.mosip.print.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-
 import io.mosip.kernel.core.cbeffutil.jaxbclasses.SingleType;
 import io.mosip.print.constant.BiometricType;
 import io.mosip.print.constant.LoggerFileConstant;
@@ -21,6 +13,13 @@ import io.mosip.print.service.impl.BioApiImpl;
 import io.mosip.print.service.impl.CbeffImpl;
 import io.mosip.print.spi.CbeffUtil;
 import io.mosip.print.spi.IBioApi;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Class CbeffToBiometricUtil.

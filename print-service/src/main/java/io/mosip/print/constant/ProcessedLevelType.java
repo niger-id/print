@@ -8,11 +8,10 @@
 package io.mosip.print.constant;
 
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 @XmlType(name = "ProcessedLevelType")
 @XmlEnum
 public enum ProcessedLevelType implements Serializable {

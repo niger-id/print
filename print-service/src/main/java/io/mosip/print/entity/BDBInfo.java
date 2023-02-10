@@ -3,20 +3,7 @@
  */
 package io.mosip.print.entity;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlList;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import io.mosip.print.constant.BiometricType;
 import io.mosip.print.constant.ProcessedLevelType;
 import io.mosip.print.constant.PurposeType;
@@ -24,6 +11,12 @@ import io.mosip.print.constant.QualityType;
 import io.mosip.print.util.DateAdapter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 /**

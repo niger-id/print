@@ -1,7 +1,6 @@
 package io.mosip.print.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 
 /**

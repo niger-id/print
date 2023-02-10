@@ -1,11 +1,5 @@
 package io.mosip.print.service.impl;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-
 import io.mosip.print.constant.QualityType;
 import io.mosip.print.entity.BDBInfo;
 import io.mosip.print.entity.BIR;
@@ -14,6 +8,11 @@ import io.mosip.print.model.KeyValuePair;
 import io.mosip.print.model.QualityScore;
 import io.mosip.print.model.Response;
 import io.mosip.print.spi.IBioApi;
+import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The Class BioApiImpl.

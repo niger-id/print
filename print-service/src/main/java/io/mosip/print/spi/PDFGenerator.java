@@ -1,5 +1,8 @@
 package io.mosip.print.spi;
 
+import io.mosip.print.model.CertificateEntry;
+import io.mosip.print.model.Rectangle;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,9 +13,6 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.cert.X509Certificate;
 import java.util.List;
-
-import io.mosip.print.model.CertificateEntry;
-import io.mosip.print.model.Rectangle;
 
 /**
  * This interface is has specifications for PDF generation from different types.

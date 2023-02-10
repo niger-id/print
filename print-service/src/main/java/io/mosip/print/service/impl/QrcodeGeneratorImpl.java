@@ -1,13 +1,5 @@
 package io.mosip.print.service.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -15,13 +7,19 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-
 import io.mosip.print.constant.QrVersion;
 import io.mosip.print.constant.QrcodeConstants;
 import io.mosip.print.constant.QrcodeExceptionConstants;
 import io.mosip.print.exception.QrcodeGenerationException;
 import io.mosip.print.spi.QrCodeGenerator;
 import io.mosip.print.util.QrcodegeneratorUtils;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * Class which provides functionality to generate QR Code

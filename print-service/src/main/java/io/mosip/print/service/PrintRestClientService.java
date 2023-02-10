@@ -1,11 +1,10 @@
 package io.mosip.print.service;
 
-import java.util.List;
-
-import org.springframework.http.MediaType;
-
 import io.mosip.print.constant.ApiName;
 import io.mosip.print.exception.ApisResourceAccessException;
+import org.springframework.http.MediaType;
+
+import java.util.List;
 
 /**
  * The Interface RegistrationProcessorRestClientService.

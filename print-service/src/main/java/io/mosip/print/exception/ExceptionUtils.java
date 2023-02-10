@@ -1,12 +1,11 @@
 package io.mosip.print.exception;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * This utils contains exception utilities.

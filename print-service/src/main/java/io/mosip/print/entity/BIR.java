@@ -1,23 +1,17 @@
 package io.mosip.print.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.mosip.print.util.Base64Adapter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import io.mosip.print.util.Base64Adapter;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 /**

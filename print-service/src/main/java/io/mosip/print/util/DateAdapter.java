@@ -7,13 +7,13 @@ package io.mosip.print.util;
  * @author Ramadurai Pandian
  * Date Adaptor class to print date to specific format
  */
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class DateAdapter extends XmlAdapter<String, LocalDateTime> {
 

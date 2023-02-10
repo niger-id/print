@@ -1,25 +1,5 @@
 package io.mosip.print.service.impl;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.html2pdf.css.media.MediaDeviceDescription;
@@ -38,26 +18,28 @@ import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.PdfStamper;
-import com.itextpdf.text.pdf.security.BouncyCastleDigest;
-import com.itextpdf.text.pdf.security.CertificateUtil;
-import com.itextpdf.text.pdf.security.CrlClient;
-import com.itextpdf.text.pdf.security.CrlClientOnline;
-import com.itextpdf.text.pdf.security.ExternalDigest;
-import com.itextpdf.text.pdf.security.ExternalSignature;
-import com.itextpdf.text.pdf.security.MakeSignature;
+import com.itextpdf.text.pdf.security.*;
 import com.itextpdf.text.pdf.security.MakeSignature.CryptoStandard;
-import com.itextpdf.text.pdf.security.OcspClient;
-import com.itextpdf.text.pdf.security.OcspClientBouncyCastle;
-import com.itextpdf.text.pdf.security.PrivateKeySignature;
-import com.itextpdf.text.pdf.security.TSAClient;
-import com.itextpdf.text.pdf.security.TSAClientBouncyCastle;
-
 import io.mosip.print.constant.PDFGeneratorExceptionCodeConstant;
 import io.mosip.print.exception.PDFGeneratorException;
 import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.model.CertificateEntry;
 import io.mosip.print.spi.PDFGenerator;
 import io.mosip.print.util.EmptyCheckUtils;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The PdfGeneratorImpl is the class you will use most when converting processed
