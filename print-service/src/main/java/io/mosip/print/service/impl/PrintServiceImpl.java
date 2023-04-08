@@ -157,7 +157,9 @@ public class PrintServiceImpl implements PrintService {
     private String partnerId;
     @Value("${mosip.datashare.policy.id}")
     private String policyId;
-    @Value("${mosip.template-language}")
+    //@Value("${mosip.template-language}")
+    //private String templateLang;
+    @Value("${mosip.default.user-preferred-language-attribute}")
     private String templateLang;
     @Value("#{'${mosip.mandatory-languages:}'.concat('${mosip.optional-languages:}')}")
     private String supportedLang;
