@@ -316,6 +316,7 @@ public class PrintServiceImpl implements PrintService {
                 if (!isQRcodeSet) {
                     printLogger.debug(PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
                 }
+                printLogger.info("Attributes:{}", Collections.singletonList(attributes));
                 // getting template and placing original valuespng
                 InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, templateLang);
                 if (uinArtifact == null) {
