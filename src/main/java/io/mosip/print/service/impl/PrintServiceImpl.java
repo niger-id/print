@@ -316,7 +316,7 @@ public class PrintServiceImpl implements PrintService {
                 if (!isQRcodeSet) {
                     printLogger.debug(PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
                 }
-                printLogger.info("Attributes:{}", Collections.singletonList(attributes));
+                printLogger.info("Attributes:{}", JSONObject.toJSONString(attributes));
                 // getting template and placing original valuespng
                 InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, templateLang);
                 if (uinArtifact == null) {
@@ -575,6 +575,10 @@ public class PrintServiceImpl implements PrintService {
                     Object object = demographicIdentity.get(value);
                     if (object != null) {
                         try {
+                            if (object instanceof Collection) {
+                                // In order to parse the collection values, mainly for VC.
+                                object = JsonUtil.writeValueAsString(object);
+                            }
                             obj = new JSONParser().parse(object.toString());
                         } catch (Exception e) {
                             obj = object;
@@ -784,4 +788,3 @@ public class PrintServiceImpl implements PrintService {
         return data;
     }
 }
-	
