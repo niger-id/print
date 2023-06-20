@@ -50,6 +50,7 @@ import java.util.*;
 @Service
 public class PrintServiceImpl implements PrintService {
 
+	private static int passwordLengthPerAttribute=4;
     /**
      * The Constant FILE_SEPARATOR.
      */
@@ -91,6 +92,9 @@ public class PrintServiceImpl implements PrintService {
      * The Constant QRCODE.
      */
     private static final String QRCODE = "QrCode";
+
+	/** The Constant UINCARDPASSWORD. */
+	private static final String UINCARDPASSWORD = "mosip.print.service.uincard.password";
 
     @Autowired
     CryptoUtil cryptoUtil;
@@ -160,8 +164,6 @@ public class PrintServiceImpl implements PrintService {
     private Boolean emailUINEnabled;
     @Value("${mosip.print.service.uincard.pdf.password.enable:false}")
     private boolean isPasswordProtected;
-    @Value("${mosip.print.service.uincard.password}")
-    private String uinCardPassword;
     @Value("${mosip.send.uin.default-email}")
     private String defaultEmailId;
 
@@ -175,7 +177,9 @@ public class PrintServiceImpl implements PrintService {
             String credential = getCredential(eventModel);
             String decodedCredential = decryptCredential(credential);
             printLogger.debug("vc is printed security valuation.... : {}", decodedCredential);
-            if (!hasPrintCredentialVerified(eventModel, decodedCredential)) return false;
+            if (!hasPrintCredentialVerified(eventModel, decodedCredential)) {
+				return false;
+			}
             byte[] pdfbytes = getDocuments(decodedCredential,
                     eventModel.getEvent().getData().get("credentialType").toString(), eventModel.getEvent().getData().get("protectionKey").toString(),
                     eventModel.getEvent().getTransactionId(), "UIN", isPasswordProtected, eventModel.getEvent().getId(),
@@ -282,7 +286,7 @@ public class PrintServiceImpl implements PrintService {
             }
             if (decryptedJson.has("biometrics")) {
                 individualBio = decryptedJson.getString("biometrics");
-                String individualBiometric = individualBio;
+				String individualBiometric = new String(individualBio);
                 isPhotoSet = setApplicantPhoto(individualBiometric, attributes);
                 attributes.put("isPhotoSet", isPhotoSet);
             }
@@ -407,8 +411,7 @@ public class PrintServiceImpl implements PrintService {
     }
 
     private String getDatashareUrl(byte[] data) throws IOException, DataShareException, ApiNotAccessibleException {
-        DataShare dataShare = dataShareUtil.getDataShare(data, policyId, partnerId);
-        return dataShare.getUrl().replace("http://", "https://");
+        return dataShareUtil.getDataShare(data, policyId, partnerId).getUrl();
     }
 
     private String getRid(Object id) {
@@ -589,7 +592,7 @@ public class PrintServiceImpl implements PrintService {
 
                         } else if (object instanceof JSONObject) {
                             JSONObject json = (JSONObject) object;
-                            attribute.put(value, json.get(VALUE));
+							attribute.put(value, (String) json.get(VALUE));
                         } else {
                             attribute.put(value, String.valueOf(object));
                         }
@@ -613,7 +616,7 @@ public class PrintServiceImpl implements PrintService {
      */
     private String getPassword(org.json.JSONObject jsonObject) throws ApisResourceAccessException, IOException {
 
-        String[] attributes = uinCardPassword.split("\\|");
+        String[] attributes = env.getProperty(UINCARDPASSWORD).split("\\|");
         List<String> list = new ArrayList<>(Arrays.asList(attributes));
         Iterator<String> it = list.iterator();
         String uinCardPd = "";
@@ -630,30 +633,33 @@ public class PrintServiceImpl implements PrintService {
             }
             if (obj instanceof JSONArray) {
                 JsonValue[] jsonValues = JsonUtil.mapJsonNodeToJavaObject(JsonValue.class, (JSONArray) obj);
-                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute(getParameter(jsonValues, templateLang)).substring(0, 4));
+                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute(getParameter(jsonValues, templateLang)));
 
             } else if (object instanceof org.json.simple.JSONObject) {
                 org.json.simple.JSONObject json = (org.json.simple.JSONObject) object;
-                uinCardPd = uinCardPd.concat((String) json.get(VALUE));
+                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute((String) json.get(VALUE)));
             } else {
-                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute(object.toString()).substring(0, 4));
+                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute(object.toString()));
             }
         }
         return uinCardPd;
     }
 
-    private String getFormattedPasswordAttribute(String password) {
-        password = password.replaceAll("[^a-zA-Z0-9]+","");
-        if (password.length() == 3) {
-            return password = password.concat(password.substring(0, 1));
-        } else if (password.length() == 2) {
-            return password = password.repeat(2);
-        } else if (password.length() == 1) {
-            return password = password.repeat(4);
-        } else {
-            return password;
-        }
-    }
+	private String getFormattedPasswordAttribute(String value) {
+		String password = value.replaceAll("[^a-zA-Z0-9]+","");
+		if (password.length() >= passwordLengthPerAttribute) {
+			return password.substring(0, passwordLengthPerAttribute);
+		} else {
+			while (password.length() < passwordLengthPerAttribute) {
+				password = password.repeat(2);
+				if (password.length() >= passwordLengthPerAttribute) {
+					password = password.substring(0, passwordLengthPerAttribute);
+					break;
+				}
+			}
+		}
+		return password;
+	}
 
     /**
      * Gets the parameter.
