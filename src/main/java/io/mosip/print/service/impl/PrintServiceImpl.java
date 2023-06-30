@@ -50,6 +50,7 @@ import java.util.*;
 @Service
 public class PrintServiceImpl implements PrintService {
 
+	private static int passwordLengthPerAttribute=4;
     /**
      * The Constant FILE_SEPARATOR.
      */
@@ -91,6 +92,9 @@ public class PrintServiceImpl implements PrintService {
      * The Constant QRCODE.
      */
     private static final String QRCODE = "QrCode";
+
+	/** The Constant UINCARDPASSWORD. */
+	private static final String UINCARDPASSWORD = "mosip.print.service.uincard.password";
 
     @Autowired
     CryptoUtil cryptoUtil;
@@ -160,8 +164,6 @@ public class PrintServiceImpl implements PrintService {
     private Boolean emailUINEnabled;
     @Value("${mosip.print.service.uincard.pdf.password.enable:false}")
     private boolean isPasswordProtected;
-    @Value("${mosip.print.service.uincard.password}")
-    private String uinCardPassword;
     @Value("${mosip.send.uin.default-email}")
     private String defaultEmailId;
 
@@ -173,13 +175,11 @@ public class PrintServiceImpl implements PrintService {
         try {
             printStatusUpdate(eventModel.getEvent().getTransactionId(), CredentialStatusConstant.RECEIVED.name(), null);
             String credential = getCredential(eventModel);
-            printStatusUpdate(eventModel.getEvent().getTransactionId(), CredentialStatusConstant.DOWNLOADED.name(), null);
             String decodedCredential = decryptCredential(credential);
             printLogger.debug("vc is printed security valuation.... : {}", decodedCredential);
-            if (!hasPrintCredentialVerified(eventModel, decodedCredential)) return false;
-            printStatusUpdate(eventModel.getEvent().getTransactionId(), CredentialStatusConstant.VALIDATED.name(), null);
-            Map proofMap = new HashMap<String, String>();
-            proofMap = (Map) eventModel.getEvent().getData().get("proof");
+            if (!hasPrintCredentialVerified(eventModel, decodedCredential)) {
+				return false;
+			}
             byte[] pdfbytes = getDocuments(decodedCredential,
                     eventModel.getEvent().getData().get("credentialType").toString(), eventModel.getEvent().getData().get("protectionKey").toString(),
                     eventModel.getEvent().getTransactionId(), "UIN", isPasswordProtected, eventModel.getEvent().getId(),
@@ -286,7 +286,7 @@ public class PrintServiceImpl implements PrintService {
             }
             if (decryptedJson.has("biometrics")) {
                 individualBio = decryptedJson.getString("biometrics");
-                String individualBiometric = individualBio;
+				String individualBiometric = new String(individualBio);
                 isPhotoSet = setApplicantPhoto(individualBiometric, attributes);
                 attributes.put("isPhotoSet", isPhotoSet);
             }
@@ -316,6 +316,7 @@ public class PrintServiceImpl implements PrintService {
                 if (!isQRcodeSet) {
                     printLogger.debug(PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
                 }
+                printLogger.info("Attributes:{}", JSONObject.toJSONString(attributes));
                 // getting template and placing original valuespng
                 InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, templateLang);
                 if (uinArtifact == null) {
@@ -324,12 +325,12 @@ public class PrintServiceImpl implements PrintService {
                             PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode());
                 }
                 pdfBytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF, password);
-
             }
             // Send UIN Card Pdf to Email
             if (emailUINEnabled) {
                 sendUINInEmail(residentEmailId, registrationId, attributes, pdfBytes);
             }
+            byteMap.put("uinPdf", pdfBytes);
             String datashareUrl = getDatashareUrl(pdfBytes);
             printStatusUpdate(requestId, CredentialStatusConstant.PRINTED.name(), datashareUrl);
             isTransactionSuccessful = true;
@@ -370,7 +371,6 @@ public class PrintServiceImpl implements PrintService {
 
             printLogger.error(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.name(), e);
             throw new PDFSignatureException(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getMessage());
-
         } catch (Exception ex) {
             description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getMessage());
             description.setCode(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getCode());
@@ -411,8 +411,7 @@ public class PrintServiceImpl implements PrintService {
     }
 
     private String getDatashareUrl(byte[] data) throws IOException, DataShareException, ApiNotAccessibleException {
-        DataShare dataShare = dataShareUtil.getDataShare(data, policyId, partnerId);
-        return dataShare.getUrl().replace("http://", "https://");
+        return dataShareUtil.getDataShare(data, policyId, partnerId).getUrl();
     }
 
     private String getRid(Object id) {
@@ -552,7 +551,7 @@ public class PrintServiceImpl implements PrintService {
      */
     @SuppressWarnings("unchecked")
     private void setTemplateAttributes(String jsonString, Map<String, Object> attribute)
-            throws IOException, ParseException {
+            throws IOException {
         try {
             JSONObject demographicIdentity = JsonUtil.objectMapperReadValue(jsonString, JSONObject.class);
             if (demographicIdentity == null)
@@ -574,6 +573,10 @@ public class PrintServiceImpl implements PrintService {
                     Object object = demographicIdentity.get(value);
                     if (object != null) {
                         try {
+                            if (object instanceof Collection) {
+                                // In order to parse the collection values, mainly for VC.
+                                object = JsonUtil.writeValueAsString(object);
+                            }
                             obj = new JSONParser().parse(object.toString());
                         } catch (Exception e) {
                             obj = object;
@@ -589,7 +592,7 @@ public class PrintServiceImpl implements PrintService {
 
                         } else if (object instanceof JSONObject) {
                             JSONObject json = (JSONObject) object;
-                            attribute.put(value, json.get(VALUE));
+							attribute.put(value, (String) json.get(VALUE));
                         } else {
                             attribute.put(value, String.valueOf(object));
                         }
@@ -613,7 +616,7 @@ public class PrintServiceImpl implements PrintService {
      */
     private String getPassword(org.json.JSONObject jsonObject) throws ApisResourceAccessException, IOException {
 
-        String[] attributes = uinCardPassword.split("\\|");
+        String[] attributes = env.getProperty(UINCARDPASSWORD).split("\\|");
         List<String> list = new ArrayList<>(Arrays.asList(attributes));
         Iterator<String> it = list.iterator();
         String uinCardPd = "";
@@ -630,30 +633,33 @@ public class PrintServiceImpl implements PrintService {
             }
             if (obj instanceof JSONArray) {
                 JsonValue[] jsonValues = JsonUtil.mapJsonNodeToJavaObject(JsonValue.class, (JSONArray) obj);
-                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute(getParameter(jsonValues, templateLang)).substring(0, 4));
+                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute(getParameter(jsonValues, templateLang)));
 
             } else if (object instanceof org.json.simple.JSONObject) {
                 org.json.simple.JSONObject json = (org.json.simple.JSONObject) object;
-                uinCardPd = uinCardPd.concat((String) json.get(VALUE));
+                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute((String) json.get(VALUE)));
             } else {
-                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute(object.toString()).substring(0, 4));
+                uinCardPd = uinCardPd.concat(getFormattedPasswordAttribute(object.toString()));
             }
         }
         return uinCardPd;
     }
 
-    private String getFormattedPasswordAttribute(String password) {
-        password = password.replaceAll("[^a-zA-Z0-9]+","");
-        if (password.length() == 3) {
-            return password = password.concat(password.substring(0, 1));
-        } else if (password.length() == 2) {
-            return password = password.repeat(2);
-        } else if (password.length() == 1) {
-            return password = password.repeat(4);
-        } else {
-            return password;
-        }
-    }
+	private String getFormattedPasswordAttribute(String value) {
+		String password = value.replaceAll("[^a-zA-Z0-9]+","");
+		if (password.length() >= passwordLengthPerAttribute) {
+			return password.substring(0, passwordLengthPerAttribute);
+		} else {
+			while (password.length() < passwordLengthPerAttribute) {
+				password = password.repeat(2);
+				if (password.length() >= passwordLengthPerAttribute) {
+					password = password.substring(0, passwordLengthPerAttribute);
+					break;
+				}
+			}
+		}
+		return password;
+	}
 
     /**
      * Gets the parameter.
@@ -783,4 +789,3 @@ public class PrintServiceImpl implements PrintService {
         return data;
     }
 }
-	
