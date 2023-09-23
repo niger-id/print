@@ -21,9 +21,7 @@ import org.springframework.util.MultiValueMap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -48,51 +46,40 @@ public class NotificationUtil {
     @Value("${mosip.primary-language}")
     private String primaryLang;
 
-    private static final String UIN_CARD_EMAIL_SUB = "RPR_UIN_CARD_EMAIL_SUB";
-    private static final String UIN_CARD_EMAIL = "RPR_UIN_CARD_EMAIL";
-    private static final String UIN_CARD_EMAIL_SUB_DEFAULT = "UIN Card Attached!";
-    private static final String UIN_CARD_EMAIL_DEFAULT = "Your UIN Card is attached.";
+    private static final String EMAIL_SUB_DEFAULT = "UIN Card Attached!";
+    private static final String EMAIL_DEFAULT = "Your UIN Card is attached.";
 
-    public List<NotificationResponseDTO> emailNotification(List<String> emailIds, String fileName, Map<String, Object> attributes,
+    public NotificationResponseDTO emailNotification(String[] mailTo, String[] mailCc, String fileName, String emailContentTpl, String emailSubTpl, Map<String, Object> attributes,
                                                            byte[] attachmentFile) throws Exception {
         log.info("sessionId", "idType", "id", "In emailNotification method of NotificationUtil service");
         HttpEntity<byte[]> doc = null;
         String fileText = null;
-        //Map<String, Object> attributes = new LinkedHashMap<>();
+        MultiValueMap<Object, Object> emailMap = new LinkedMultiValueMap<>();
         if (attachmentFile != null) {
             LinkedMultiValueMap<String, String> pdfHeaderMap = new LinkedMultiValueMap<>();
             pdfHeaderMap.add("Content-disposition",
                     "form-data; name=attachments; filename=" + fileName + ".pdf");
             pdfHeaderMap.add("Content-type", "application/pdf");
             doc = new HttpEntity<>(attachmentFile, pdfHeaderMap);
+            emailMap.add("attachments", doc);
         }
-
-        ResponseWrapper<?> responseWrapper = null;
-        List<NotificationResponseDTO> notifierResponseList = new ArrayList<>();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        MultiValueMap<Object, Object> emailMap = new LinkedMultiValueMap<>();
-        emailMap.add("attachments", doc);
-        emailMap.add("mailContent", getEmailContent(attributes));
-        emailMap.add("mailSubject", getEmailSubject(attributes));
+        emailMap.add("mailContent", getEmailContent(emailContentTpl, attributes));
+        emailMap.add("mailSubject", getEmailSubject(emailSubTpl, attributes));
+        emailMap.set("mailTo", mailTo);
+        emailMap.set("mailCc", mailCc);
 
         log.info("sessionId", "idType", "id",
                 "In emailNotification method of NotificationUtil service emailResourceUrl: " + emailResourceUrl);
-        emailIds.forEach(emailId -> {
-            try {
-                notifierResponseList.add(sendEmail(emailId, headers, emailMap));
-            } catch (Exception e) {
-                log.error("Failed to send notification via email.{}", emailId, e);
-            }
-        });
-        return notifierResponseList;
+        return sendEmail(headers, emailMap);
     }
 
-    private NotificationResponseDTO sendEmail(String emailId, HttpHeaders headers, MultiValueMap<Object, Object> emailMap) throws Exception {
+    private NotificationResponseDTO sendEmail( HttpHeaders headers, MultiValueMap<Object, Object> emailMap) throws Exception {
         NotificationResponseDTO notifierResponse = new NotificationResponseDTO();
         try {
-            emailMap.set("mailTo", emailId);
+
             HttpEntity<MultiValueMap<Object, Object>> httpEntity = new HttpEntity<>(emailMap, headers);
             ResponseWrapper<?> responseWrapper = (ResponseWrapper<?>) restApiClient.postApi(emailResourceUrl,
                     MediaType.MULTIPART_FORM_DATA, httpEntity, ResponseWrapper.class);
@@ -111,18 +98,18 @@ public class NotificationUtil {
         return notifierResponse;
     }
 
-    private String getEmailContent(Map<String, Object> attributes) throws IOException, ApisResourceAccessException {
-        InputStream in = templateGenerator.getTemplate(UIN_CARD_EMAIL, attributes, primaryLang);
+    private String getEmailContent(String emailContentTpl, Map<String, Object> attributes) throws IOException, ApisResourceAccessException {
+        InputStream in = templateGenerator.getTemplate(emailContentTpl, attributes, primaryLang);
         if (in == null) {
-            return UIN_CARD_EMAIL_DEFAULT;
+            return EMAIL_DEFAULT;
         }
         return new String(in.readAllBytes(), StandardCharsets.UTF_8);
     }
 
-    private String getEmailSubject(Map<String, Object> attributes) throws IOException, ApisResourceAccessException {
-        InputStream in = templateGenerator.getTemplate(UIN_CARD_EMAIL_SUB, attributes, primaryLang);
+    private String getEmailSubject(String emailSubTpl, Map<String, Object> attributes) throws IOException, ApisResourceAccessException {
+        InputStream in = templateGenerator.getTemplate(emailSubTpl, attributes, primaryLang);
         if (in == null) {
-            return UIN_CARD_EMAIL_SUB_DEFAULT;
+            return EMAIL_SUB_DEFAULT;
         }
         return new String(in.readAllBytes(), StandardCharsets.UTF_8);
     }

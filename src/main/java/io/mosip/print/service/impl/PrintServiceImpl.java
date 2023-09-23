@@ -23,6 +23,7 @@ import io.mosip.vercred.exception.ProofTypeNotFoundException;
 import io.mosip.vercred.exception.PubicKeyNotFoundException;
 import io.mosip.vercred.exception.UnknownException;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -34,6 +35,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -76,6 +79,11 @@ public class PrintServiceImpl implements PrintService {
      * The Constant UIN_CARD_TEMPLATE.
      */
     private static final String UIN_CARD_TEMPLATE = "RPR_UIN_CARD_TEMPLATE";
+    private static final String UIN_CARD_EMAIL_SUB = "RPR_UIN_CARD_EMAIL_SUB";
+    private static final String UIN_CARD_EMAIL = "RPR_UIN_CARD_EMAIL";
+    private static final String ACCT_EMAIL_SUB = "RPR_ACCT_NOTIFY_EMAIL_SUB";
+    private static final String ACCT_EMAIL = "RPR_ACCT_NOTIFY_EMAIL";
+    private static final String REG_PRINT_SERVICE_ID = "mosip.print.service.id";
     /**
      * The Constant FACE.
      */
@@ -109,6 +117,8 @@ public class PrintServiceImpl implements PrintService {
     private DataShareUtil dataShareUtil;
     @Autowired
     private RestApiClient restApiClient;
+    @Autowired
+    private RestTemplate restTemplate;
     @Autowired
     private CryptoCoreUtil cryptoCoreUtil;
     /**
@@ -154,8 +164,8 @@ public class PrintServiceImpl implements PrintService {
     private String policyId;
     @Value("${mosip.template-language}")
     private String templateLang;
-    @Value("#{'${mosip.mandatory-languages:}'.concat('${mosip.optional-languages:}')}")
-    private String supportedLang;
+    @Value("#{T(java.util.Arrays).asList('${mosip.supported-languages:}')}")
+    private List<String> supportedLang;
     @Value("${mosip.print.verify.credentials.flag:true}")
     private boolean verifyCredentialsFlag;
     @Value("${token.request.clientId}")
@@ -164,8 +174,16 @@ public class PrintServiceImpl implements PrintService {
     private Boolean emailUINEnabled;
     @Value("${mosip.print.service.uincard.pdf.password.enable:false}")
     private boolean isPasswordProtected;
-    @Value("${mosip.send.uin.default-email}")
-    private String defaultEmailId;
+    @Value("${mosip.send.uin.default-emailIds}")
+    private String[] defaultEmailIds;
+    @Value("${mosip.print.service.mpesa.enabled:false}")
+    private Boolean isMpesaEnabled;
+    @Value("${mosip.print.service.mpesa.account.creation.url}")
+    private String simpleMpesaUrl;
+    @Value("${mosip.print.service.mpesa.password.length}")
+    private int mpesaPasswordLength;
+    @Value("${mosip.print.service.id}")
+    private String serviceId;
 
     @Autowired
     private NotificationUtil notificationUtil;
@@ -331,6 +349,10 @@ public class PrintServiceImpl implements PrintService {
                 sendUINInEmail(residentEmailId, registrationId, attributes, pdfBytes);
             }
             byteMap.put("uinPdf", pdfBytes);
+            // Simple MPESA integration
+            if (isMpesaEnabled) {
+                integrateMpesa(residentEmailId, registrationId, attributes);
+            }
             String datashareUrl = getDatashareUrl(pdfBytes);
             printStatusUpdate(requestId, CredentialStatusConstant.PRINTED.name(), datashareUrl);
             isTransactionSuccessful = true;
@@ -410,6 +432,46 @@ public class PrintServiceImpl implements PrintService {
         return byteMap;
     }
 
+    private void integrateMpesa(String residentEmailId, String registrationId, Map<String, Object> attributes) {
+        try {
+            String password = RandomStringUtils.randomAlphanumeric(mpesaPasswordLength);
+            MpesaRequest request = getSubscriberRequest(residentEmailId, password, attributes);
+            printLogger.info("Account creation request.{}", request.toString());
+            MpesaResponse response = restTemplate.postForObject(simpleMpesaUrl, request, MpesaResponse.class);
+            if ("success".equalsIgnoreCase(response.getStatus())) {
+                printLogger.info("Account Created and the details sent successfully via Email, server response..{}", response.toString());
+                sendNotificationEmail(residentEmailId, attributes);
+            }
+        } catch (HttpClientErrorException clientExc) {
+            printLogger.error("Account creation failed for .{}", residentEmailId, clientExc);
+        } catch (Exception e) {
+            printLogger.error("Failed to send account creation notification email.{}", residentEmailId, e);
+        }
+    }
+
+    private MpesaRequest getSubscriberRequest(String residentEmailId, String password, Map<String, Object> attributes) {
+        MpesaRequest request = new MpesaRequest();
+        attributes.put("accountPwd", password);
+        supportedLang.forEach(lang -> setValue(request, lang,attributes));
+        request.setEmail(residentEmailId);
+        request.setPhoneNumber(attributes.get("phone").toString());
+        request.setPassword(password);
+        return request;
+    }
+
+    private void setValue(MpesaRequest request, String lang, Map<String, Object> attributes) {
+        Object firstName = attributes.get("firstName_" + lang);
+        Object lastName = attributes.get("lastName_" + lang);
+        if (firstName != null
+                && StringUtils.hasText(firstName.toString())) {
+            request.setFirstName(firstName.toString());
+        }
+        if (lastName != null
+                && StringUtils.hasText(lastName.toString())) {
+            request.setLastName(lastName.toString());
+        }
+    }
+
     private String getDatashareUrl(byte[] data) throws IOException, DataShareException, ApiNotAccessibleException {
         return dataShareUtil.getDataShare(data, policyId, partnerId).getUrl();
     }
@@ -418,15 +480,25 @@ public class PrintServiceImpl implements PrintService {
         return id.toString().split("/credentials/")[1];
     }
 
+    private void sendNotificationEmail(String residentEmailId, Map<String, Object> attributes) throws Exception {
+        try {
+            String[] mailTo = {residentEmailId};
+            NotificationResponseDTO notificationResponseDTO = notificationUtil.emailNotification(mailTo, defaultEmailIds, null,
+                    ACCT_EMAIL, ACCT_EMAIL_SUB, attributes, null);
+            printLogger.info("Account creation notification sent successfully via Email, server response..{}", notificationResponseDTO);
+        } catch (Exception e) {
+            printLogger.error("Failed to send Account creation notification.{}", residentEmailId, e);
+            throw e;
+        }
+    }
+
     private void sendUINInEmail(String residentEmailId, String fileName, Map<String, Object> attributes, byte[] pdfbytes) {
         if (pdfbytes != null) {
             try {
-                List<String> emailIds = Arrays.asList(residentEmailId, defaultEmailId);
-                List<NotificationResponseDTO> responseDTOs = notificationUtil.emailNotification(emailIds, fileName,
-                        attributes, pdfbytes);
-                responseDTOs.forEach(responseDTO ->
-                        printLogger.info("UIN sent successfully via Email, server response..{}", responseDTO)
-                );
+                String[] mailTo = {residentEmailId};
+                NotificationResponseDTO responseDTO = notificationUtil.emailNotification(mailTo, defaultEmailIds, fileName,
+                        UIN_CARD_EMAIL_SUB, UIN_CARD_EMAIL, attributes, pdfbytes);
+                printLogger.info("UIN sent successfully via Email, server response..{}", responseDTO);
             } catch (Exception e) {
                 printLogger.error("Failed to send pdf UIN via email.{}", residentEmailId, e);
             }
