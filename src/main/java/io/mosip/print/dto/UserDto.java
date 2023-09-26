@@ -8,4 +8,6 @@ import java.io.Serializable;
 public class UserDto implements Serializable {
     private String userID;
     private String userType;
+    private String token;
+    private String message;
 }
