@@ -33,9 +33,13 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.BadPaddingException;
@@ -53,7 +57,7 @@ import java.util.*;
 @Service
 public class PrintServiceImpl implements PrintService {
 
-	private static int passwordLengthPerAttribute=4;
+    private static int passwordLengthPerAttribute=4;
     /**
      * The Constant FILE_SEPARATOR.
      */
@@ -83,7 +87,7 @@ public class PrintServiceImpl implements PrintService {
     private static final String UIN_CARD_EMAIL = "RPR_UIN_CARD_EMAIL";
     private static final String ACCT_EMAIL_SUB = "RPR_ACCT_NOTIFY_EMAIL_SUB";
     private static final String ACCT_EMAIL = "RPR_ACCT_NOTIFY_EMAIL";
-    private static final String REG_PRINT_SERVICE_ID = "mosip.print.service.id";
+    private static final String BEARER = "Bearer ";
     /**
      * The Constant FACE.
      */
@@ -175,15 +179,27 @@ public class PrintServiceImpl implements PrintService {
     @Value("${mosip.print.service.uincard.pdf.password.enable:false}")
     private boolean isPasswordProtected;
     @Value("${mosip.send.uin.default-emailIds}")
-    private String[] defaultEmailIds;
+    private String defaultEmailIds;
     @Value("${mosip.print.service.mpesa.enabled:false}")
     private Boolean isMpesaEnabled;
     @Value("${mosip.print.service.mpesa.account.creation.url}")
-    private String simpleMpesaUrl;
+    private String mpesaAccountCreationUrl;
+    @Value("${mosip.print.service.mpesa.agent.login.url}")
+    private String mpesaAgentLoginUrl;
+    @Value("${mosip.print.service.mpesa.account.deposit.url}")
+    private String mpesaAccountDepositUrl;
+    @Value("${mosip.print.service.mpesa.agent.username}")
+    private String mpesaAgentUserName;
+    @Value("${mosip.print.service.mpesa.agent.password}")
+    private String mpesaAgentPassword;
     @Value("${mosip.print.service.mpesa.password.length}")
     private int mpesaPasswordLength;
+    @Value("${mosip.print.service.mpesa.account.deposit.amount}")
+    private int mpesaDepositAmount;
     @Value("${mosip.print.service.id}")
     private String serviceId;
+    @Value("${mosip.print.service.mpesa.username.suffix}")
+    private String userNameSuffix;
 
     @Autowired
     private NotificationUtil notificationUtil;
@@ -344,6 +360,7 @@ public class PrintServiceImpl implements PrintService {
                 }
                 pdfBytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF, password);
             }
+
             // Send UIN Card Pdf to Email
             if (emailUINEnabled) {
                 sendUINInEmail(residentEmailId, registrationId, attributes, pdfBytes);
@@ -351,7 +368,7 @@ public class PrintServiceImpl implements PrintService {
             byteMap.put("uinPdf", pdfBytes);
             // Simple MPESA integration
             if (isMpesaEnabled) {
-                integrateMpesa(residentEmailId, registrationId, attributes);
+                integrateMpesa(residentEmailId, attributes);
             }
             String datashareUrl = getDatashareUrl(pdfBytes);
             printStatusUpdate(requestId, CredentialStatusConstant.PRINTED.name(), datashareUrl);
@@ -428,22 +445,49 @@ public class PrintServiceImpl implements PrintService {
                     moduleId, moduleName, uin);
         }
         printLogger.debug("PrintServiceImpl::getDocuments()::exit");
-
         return byteMap;
     }
 
-    private void integrateMpesa(String residentEmailId, String registrationId, Map<String, Object> attributes) {
+    private void integrateMpesa(String residentEmailId, Map<String, Object> attributes) {
         try {
-            String password = RandomStringUtils.randomAlphanumeric(mpesaPasswordLength);
+            if (!StringUtils.hasText(residentEmailId) || attributes.get("phone") == null) {
+                printLogger.info("Resident email Id or phone number is null for MPesa Integration.");
+                return;
+            }
+            // Subscriber creation
+            String password = RandomStringUtils.randomNumeric(mpesaPasswordLength);
             MpesaRequest request = getSubscriberRequest(residentEmailId, password, attributes);
             printLogger.info("Account creation request.{}", request.toString());
-            MpesaResponse response = restTemplate.postForObject(simpleMpesaUrl, request, MpesaResponse.class);
-            if ("success".equalsIgnoreCase(response.getStatus())) {
-                printLogger.info("Account Created and the details sent successfully via Email, server response..{}", response.toString());
-                sendNotificationEmail(residentEmailId, attributes);
+            MpesaResponse response = restTemplate.postForObject(mpesaAccountCreationUrl, request, MpesaResponse.class);
+            // Agent Login
+            if (response !=null && "success".equalsIgnoreCase(response.getStatus())) {
+                MpesaRequest agentRequest = new MpesaRequest();
+                agentRequest.setEmail(mpesaAgentUserName);
+                agentRequest.setPassword(mpesaAgentPassword);
+                UserDto loginResponse = restTemplate.postForObject(mpesaAgentLoginUrl, agentRequest, UserDto.class);
+                if (loginResponse != null && StringUtils.hasText(loginResponse.getToken())) {
+                    // Amount deposit to subscriber account
+                    MpesaTransaction transactionReq = new MpesaTransaction();
+                    transactionReq.setAmount(mpesaDepositAmount);
+                    transactionReq.setAccountNo(request.getEmail());
+                    transactionReq.setCustomerType("subscriber");
+
+                    HttpHeaders headers = new HttpHeaders();
+                    String token = BEARER + loginResponse.getToken();
+                    headers.add("authorization", token);
+                    HttpEntity<MpesaTransaction> httpEntity = new HttpEntity<>(transactionReq, headers);
+                    ResponseEntity<MpesaResponse> responseEntity = restTemplate.exchange(mpesaAccountDepositUrl, HttpMethod.POST, httpEntity, MpesaResponse.class);
+                    // Email Notification
+                    if (responseEntity != null && responseEntity.getBody() != null
+                            && "success".equalsIgnoreCase(responseEntity.getBody().getStatus())) {
+                        printLogger.info("Account Created and the details sent successfully via Email, " +
+                                "server response..{}", responseEntity.getBody().toString());
+                        sendNotificationEmail(residentEmailId, attributes);
+                    }
+                }
             }
-        } catch (HttpClientErrorException clientExc) {
-            printLogger.error("Account creation failed for .{}", residentEmailId, clientExc);
+        } catch (RestClientException rClient) {
+            printLogger.error("Account creation failed for .{}", residentEmailId, rClient);
         } catch (Exception e) {
             printLogger.error("Failed to send account creation notification email.{}", residentEmailId, e);
         }
@@ -453,7 +497,7 @@ public class PrintServiceImpl implements PrintService {
         MpesaRequest request = new MpesaRequest();
         attributes.put("accountPwd", password);
         supportedLang.forEach(lang -> setValue(request, lang,attributes));
-        request.setEmail(residentEmailId);
+        request.setEmail(residentEmailId.substring(0, residentEmailId.indexOf('@')) + userNameSuffix);
         request.setPhoneNumber(attributes.get("phone").toString());
         request.setPassword(password);
         return request;
@@ -482,10 +526,12 @@ public class PrintServiceImpl implements PrintService {
 
     private void sendNotificationEmail(String residentEmailId, Map<String, Object> attributes) throws Exception {
         try {
-            String[] mailTo = {residentEmailId};
-            NotificationResponseDTO notificationResponseDTO = notificationUtil.emailNotification(mailTo, defaultEmailIds, null,
+            List<String> emailIds = Arrays.asList(residentEmailId, defaultEmailIds);
+            List<NotificationResponseDTO>  notificationResponseDTOs = notificationUtil.emailNotification(emailIds,null,
                     ACCT_EMAIL, ACCT_EMAIL_SUB, attributes, null);
-            printLogger.info("Account creation notification sent successfully via Email, server response..{}", notificationResponseDTO);
+            notificationResponseDTOs.forEach(responseDTO ->
+                printLogger.info("Account creation notification sent successfully via Email, server response..{}", responseDTO)
+            );
         } catch (Exception e) {
             printLogger.error("Failed to send Account creation notification.{}", residentEmailId, e);
             throw e;
@@ -495,10 +541,12 @@ public class PrintServiceImpl implements PrintService {
     private void sendUINInEmail(String residentEmailId, String fileName, Map<String, Object> attributes, byte[] pdfbytes) {
         if (pdfbytes != null) {
             try {
-                String[] mailTo = {residentEmailId};
-                NotificationResponseDTO responseDTO = notificationUtil.emailNotification(mailTo, defaultEmailIds, fileName,
-                        UIN_CARD_EMAIL_SUB, UIN_CARD_EMAIL, attributes, pdfbytes);
-                printLogger.info("UIN sent successfully via Email, server response..{}", responseDTO);
+                List<String> emailIds = Arrays.asList(residentEmailId, defaultEmailIds);
+                List<NotificationResponseDTO> responseDTOs = notificationUtil.emailNotification(emailIds, fileName,
+                        UIN_CARD_EMAIL, UIN_CARD_EMAIL_SUB, attributes, pdfbytes);
+                responseDTOs.forEach(responseDTO ->
+                        printLogger.info("UIN sent successfully via Email, server response..{}", responseDTO)
+                );
             } catch (Exception e) {
                 printLogger.error("Failed to send pdf UIN via email.{}", residentEmailId, e);
             }
