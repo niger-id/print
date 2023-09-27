@@ -495,9 +495,11 @@ public class PrintServiceImpl implements PrintService {
 
     private MpesaRequest getSubscriberRequest(String residentEmailId, String password, Map<String, Object> attributes) {
         MpesaRequest request = new MpesaRequest();
-        attributes.put("accountPwd", password);
         supportedLang.forEach(lang -> setValue(request, lang,attributes));
-        request.setEmail(residentEmailId.substring(0, residentEmailId.indexOf('@')) + userNameSuffix);
+        String userName = residentEmailId.substring(0, residentEmailId.indexOf('@')) + userNameSuffix;
+        attributes.put("mpesaUserName", userName);
+        attributes.put("mpesaPassword", password);
+        request.setEmail(userName);
         request.setPhoneNumber(attributes.get("phone").toString());
         request.setPassword(password);
         return request;
