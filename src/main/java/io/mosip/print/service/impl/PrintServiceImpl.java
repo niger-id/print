@@ -198,8 +198,10 @@ public class PrintServiceImpl implements PrintService {
     private int mpesaDepositAmount;
     @Value("${mosip.print.service.id}")
     private String serviceId;
-    @Value("${mosip.print.service.mpesa.username.suffix}")
-    private String userNameSuffix;
+    @Value("${mosip.print.service.mpesa.subs.username.suffix}")
+    private String subsUserNameSuffix;
+    @Value("${mosip.print.service.mpesa.subs.password}")
+    private String subsPassword;
 
     @Autowired
     private NotificationUtil notificationUtil;
@@ -455,8 +457,8 @@ public class PrintServiceImpl implements PrintService {
                 return;
             }
             // Subscriber creation
-            String password = RandomStringUtils.randomNumeric(mpesaPasswordLength);
-            MpesaRequest request = getSubscriberRequest(residentEmailId, password, attributes);
+            //String password = RandomStringUtils.randomNumeric(mpesaPasswordLength);
+            MpesaRequest request = getSubscriberRequest(residentEmailId, subsPassword, attributes);
             printLogger.info("Account creation request.{}", request.toString());
             MpesaResponse response = restTemplate.postForObject(mpesaAccountCreationUrl, request, MpesaResponse.class);
             // Agent Login
@@ -496,10 +498,10 @@ public class PrintServiceImpl implements PrintService {
     private MpesaRequest getSubscriberRequest(String residentEmailId, String password, Map<String, Object> attributes) {
         MpesaRequest request = new MpesaRequest();
         supportedLang.forEach(lang -> setValue(request, lang,attributes));
-        String userName = residentEmailId.substring(0, residentEmailId.indexOf('@')) + userNameSuffix;
-        attributes.put("mpesaUserName", userName);
+        //String userName = residentEmailId.substring(0, residentEmailId.indexOf('@')) + subsUserNameSuffix;
+        attributes.put("mpesaUserName", residentEmailId);
         attributes.put("mpesaPassword", password);
-        request.setEmail(userName);
+        request.setEmail(residentEmailId);
         request.setPhoneNumber(attributes.get("phone").toString());
         request.setPassword(password);
         return request;
