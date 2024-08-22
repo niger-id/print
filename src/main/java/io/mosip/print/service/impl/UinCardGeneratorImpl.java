@@ -82,14 +82,14 @@ public class UinCardGeneratorImpl implements UinCardGenerator<byte[]> {
 
 
 	@Override
-	public byte[] generateUinCard(InputStream in, UinCardType type, String password)
-			throws ApisResourceAccessException {
+	public byte[] generateUinCard(InputStream in, UinCardType type, String password){
+			//throws ApisResourceAccessException {
 		printLogger.debug("UinCardGeneratorImpl::generateUinCard()::entry");
-        byte[] pdfSignatured=null;
+        //byte[] pdfSignatured=null;
 		ByteArrayOutputStream out = null;
 		try {
 			out = (ByteArrayOutputStream) pdfGenerator.generate(in);
-			PDFSignatureRequestDto request = new PDFSignatureRequestDto(lowerLeftX, lowerLeftY, upperRightX,
+			/*PDFSignatureRequestDto request = new PDFSignatureRequestDto(lowerLeftX, lowerLeftY, upperRightX,
 					upperRightY, reason, 1, password);
 			request.setApplicationId("KERNEL");
 		  	request.setReferenceId("SIGN");
@@ -117,21 +117,21 @@ public class UinCardGeneratorImpl implements UinCardGenerator<byte[]> {
 			signatureResponseDto = mapper.readValue(mapper.writeValueAsString(responseWrapper.getResponse()),
 					SignatureResponseDto.class);
 
-			pdfSignatured = Base64.decodeBase64(signatureResponseDto.getData());
+			pdfSignatured = Base64.decodeBase64(signatureResponseDto.getData());*/
 
 		} catch (IOException | PDFGeneratorException e) {
 			printLogger.error( e.getMessage(),e);
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
 					PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorMessage() ,e);
-		} 
+		} /*
 		catch (ApisResourceAccessException e) {
 					printLogger.error(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.name() , e.getMessage()
 			 ,e);
-					throw new PDFSignatureException(e); }
+					throw new PDFSignatureException(e); }*/
 			 
 		 	printLogger.debug("UinCardGeneratorImpl::generateUinCard()::exit");
 
-		return pdfSignatured;
+		return out.toByteArray();
 	}
 
 }
